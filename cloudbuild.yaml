@@ -1,0 +1,21 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        gcloud functions deploy $_FUNCTION_NAME \
+          --runtime nodejs22 \
+          --trigger-http \
+          --entry-point $_ENTRY_POINT \
+          --set-env-vars "DEFAULT_TIMEZONE=America/Chicago,SALT_COST_FACTOR=10,JWT_EXPIRES_IN=1d,ORIGIN_URL=https://day-forge.netlify.app,COOKIE_NAME=dayforge_jwt" \
+          --set-secrets "DB_USERNAME=projects/$_PROJECT_ID/secrets/DB_USERNAME:latest,PASSWORD=projects/$_PROJECT_ID/secrets/PASSWORD:latest,DATABASE_DAYFORGE=projects/$_PROJECT_ID/secrets/DATABASE_DAYFORGE:latest,JWT_SECRET_FOR_DAYFORGE=projects/$_PROJECT_ID/secrets/JWT_SECRET_FOR_DAYFORGE:latest" \
+          --region $_REGION
+
+substitutions:
+  _PROJECT_ID: "allprojects-424621"
+  _REGION: "us-central1"
+  _FUNCTION_NAME: "dayforge-function"
+  _ENTRY_POINT: "dayForgeAPI"
+
+timeout: "600s"
