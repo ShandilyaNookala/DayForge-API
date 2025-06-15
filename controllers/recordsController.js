@@ -106,7 +106,6 @@ exports.updateOrCreateRecordInArray = async (req, res) => {
 
   try {
     if (req.body.result !== null && req.body.result !== undefined) {
-      console.log("HEY PIG");
       authController.restrictTo("admin")(req, res, () => {});
     }
     const { recordId } = req.params;
@@ -306,7 +305,6 @@ exports.getAutomaticDataWithMistakes = async (req, res) => {
 
 exports.addRecord = async (req, res) => {
   try {
-    console.log("HELLO");
     const newRecord = await recordsTableModel.create({
       taskName: req.body.taskName,
       student: req.body.studentId,
@@ -430,7 +428,6 @@ exports.markObsolete = async (req, res) => {
       : process.env.DEFAULT_TIMEZONE;
     const localDate = getCurrentDate(timezone);
     const nextDateUtc = getNextDate(timezone);
-    console.log(nextDateUtc);
     let tasks;
     if (!tasksToMarkObsolete) {
       const allPositions = await positionsTableModel

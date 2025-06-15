@@ -10,7 +10,10 @@ router
 
 router
   .route("/mark-obsolete")
-  .post(authController.restrictTo("student"), recordsController.markObsolete);
+  .post(
+    authController.restrictTo("student", "semi-admin"),
+    recordsController.markObsolete
+  );
 
 router
   .route("/get-automatic-data-with-mistakes/:taskId/:recordId")

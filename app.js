@@ -32,7 +32,6 @@ app.use(xss());
 app.use(mongoSanitize());
 app.use(cookieParser());
 app.use((req, res, next) => {
-  console.log(req.path);
   if (req.method === "POST" && nonProtectedRoutes.includes(req.path)) {
     next();
   } else {

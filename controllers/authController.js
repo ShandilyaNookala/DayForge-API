@@ -49,8 +49,8 @@ exports.login = async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      message: "Successfully logged in",
       data: userData,
+      token,
     });
   } catch (err) {
     console.error(err);
@@ -63,7 +63,10 @@ exports.login = async (req, res) => {
 
 exports.protect = async (req, res, next) => {
   try {
-    const user = await getUserFromToken(req.cookies[process.env.COOKIE_NAME]);
+    const user = await getUserFromToken(
+      req.cookies[process.env.COOKIE_NAME] ||
+        req.headers.authorization?.split(" ")[1]
+    );
     req.user = user;
     next();
   } catch (err) {
