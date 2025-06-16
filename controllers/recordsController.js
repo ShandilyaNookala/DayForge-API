@@ -423,13 +423,14 @@ exports.getAutomaticData = async (req, res) => {
 exports.markObsolete = async (req, res) => {
   try {
     const tasksToMarkObsolete = req.body.tasksToMarkObsolete;
-    const timezone = tasksToMarkObsolete
-      ? getIPLocationOfUser(req)
-      : process.env.DEFAULT_TIMEZONE;
+    const timezone =
+      req.user.role !== "semi-admin"
+        ? getIPLocationOfUser(req)
+        : process.env.DEFAULT_TIMEZONE;
     const localDate = getCurrentDate(timezone);
     const nextDateUtc = getNextDate(timezone);
     let tasks;
-    if (!tasksToMarkObsolete) {
+    if (req.user.role === "semi-admin") {
       const allPositions = await positionsTableModel
         .find({ position: "currentTasks" })
         .select("tasks")
@@ -438,6 +439,7 @@ exports.markObsolete = async (req, res) => {
     } else {
       tasks = await recordsTableModel.find({
         _id: { $in: tasksToMarkObsolete },
+        student: req.user._id,
       });
     }
     await Promise.all(
