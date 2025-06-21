@@ -73,6 +73,22 @@ function getNewRecords(records, rule) {
     .reverse();
 }
 
+function getSummaryProblems(field) {
+  if (!this.rule) return null;
+  return new Set(
+    this.records
+      .filter(
+        (record) =>
+          record[field] &&
+          Array.isArray(record[field]) &&
+          record.result !== null
+      )
+      .flatMap((record) =>
+        record[field].map((fieldUnit) => String(fieldUnit._id))
+      )
+  ).size;
+}
+
 recordSchema.virtual("timeTaken").get(function () {
   return this.startTime && this.endTime
     ? this.endTime.getTime() - this.startTime.getTime()
@@ -89,6 +105,18 @@ recordSchema.virtual("formattedResult").get(function () {
 
 recordSchema.virtual("formattedGrade").get(function () {
   return getGrades(this.grade);
+});
+
+recordsTableSchema.virtual("totalProblems").get(function () {
+  return this.rule ? this.rule?.ruleInputs?.length : null;
+});
+
+recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
+  return getSummaryProblems.call(this, "work");
+});
+
+recordsTableSchema.virtual("mistakes").get(function () {
+  return getSummaryProblems.call(this, "result");
 });
 
 recordsTableSchema.post(/^find/, function (docs, next) {
@@ -114,5 +142,8 @@ recordsTableSchema.post("aggregate", function (docs, next) {
 
 recordSchema.set("toJSON", { virtuals: true });
 recordSchema.set("toObject", { virtuals: true });
+
+recordsTableSchema.set("toJSON", { virtuals: true });
+recordsTableSchema.set("toObject", { virtuals: true });
 
 module.exports = mongoose.model("record", recordsTableSchema);
