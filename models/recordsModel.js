@@ -77,7 +77,7 @@ function getSummaryProblems(field) {
   if (!this.rule) return null;
   return new Set(
     this.records
-      .filter(
+      ?.filter(
         (record) =>
           record[field] &&
           Array.isArray(record[field]) &&
