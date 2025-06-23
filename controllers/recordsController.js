@@ -32,6 +32,7 @@ async function getCommonRecordsData(newRecords, req) {
       !record.startTime &&
       !record.endTime;
   });
+  newRecords.rule = newRecords.rule?._id;
   return { newRecords, previousTask, nextTask };
 }
 
