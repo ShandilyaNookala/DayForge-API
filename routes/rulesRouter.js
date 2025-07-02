@@ -46,4 +46,6 @@ router
     rulesController.changeRuleInputOrder
   );
 
+router.route("/get-all-rules").get(rulesController.getAllRules);
+
 module.exports = router;

@@ -213,6 +213,28 @@ exports.updateThresholdPoints = async (req, res) => {
   }
 };
 
+exports.updateRuleForTask = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const ruleId = req.body.ruleId;
+    const updatedTask = await recordsTableModel.findByIdAndUpdate(
+      taskId,
+      { rule: ruleId },
+      { new: true }
+    );
+    res.status(200).json({
+      status: "success",
+      data: updatedTask,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 exports.getStudentTasks = async (req, res) => {
   try {
     const timezone = getIPLocationOfUser(req);

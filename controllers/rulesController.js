@@ -153,3 +153,17 @@ exports.changeRuleInputOrder = async (req, res) => {
     res.status(400).json({ status: "fail", message: err.message });
   }
 };
+
+exports.getAllRules = async (req, res) => {
+  try {
+    const rules = (await rulesTableModel.find().select("ruleName")).map(
+      (rule) => {
+        return { id: rule._id, label: `${rule.ruleName} -- ${rule._id}` };
+      }
+    );
+    res.status(200).json({ status: "success", data: rules });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};

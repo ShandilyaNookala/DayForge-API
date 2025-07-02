@@ -41,6 +41,13 @@ router
   );
 
 router
+  .route("/update-rule-for-task/:taskId")
+  .patch(
+    authController.restrictTo("admin"),
+    recordsController.updateRuleForTask
+  );
+
+router
   .route("/get-automatic-data/:taskId")
   .get(authController.restrictTo("admin"), recordsController.getAutomaticData);
 
