@@ -5,18 +5,32 @@ const rulesTableSchema = mongoose.Schema({
     type: [
       {
         name: { type: String, required: [true, "Rule inputs must have name"] },
-        type: { type: String, required: [true, "Rule inputs must have type"] },
+        ruleCategoryId: {
+          type: mongoose.Schema.ObjectId,
+          required: [true, "Rule inputs must have rule category id"],
+        },
         points: {
           type: Number,
           required: [true, "Rule inputs must have points."],
         },
       },
     ],
-    required: [true, "The rules must have some inputs."],
+    default: [],
   },
   ruleName: {
     type: String,
     required: [true, "The rules must have a name."],
+  },
+  ruleCategories: {
+    type: [
+      {
+        name: {
+          type: String,
+          required: [true, "Rule category must have a name"],
+        },
+      },
+    ],
+    default: [],
   },
 });
 

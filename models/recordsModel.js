@@ -42,6 +42,10 @@ const recordsTableSchema = mongoose.Schema({
     default: [],
     required: [true, "The records must have a record."],
   },
+  skippedRuleCategories: {
+    type: [mongoose.Schema.ObjectId],
+    default: [],
+  },
 });
 
 function getNamesOfRuleInputs(ruleInputs) {
@@ -81,7 +85,8 @@ function getSummaryProblems(field) {
         (record) =>
           record[field] &&
           Array.isArray(record[field]) &&
-          record.result !== null
+          record.result !== null &&
+          record.grade !== 1
       )
       .flatMap((record) =>
         record[field].map((fieldUnit) => String(fieldUnit._id))

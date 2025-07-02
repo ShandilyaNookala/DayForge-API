@@ -35,7 +35,7 @@ exports.getManageRules = async (req, res) => {
   }
 };
 
-exports.doesRuleExist = async (req, res) => {
+exports.getRule = async (req, res) => {
   try {
     const data = (await rulesTableModel.findById(req.params.id)) || null;
     res.status(200).json({ status: "success", data });
@@ -45,15 +45,109 @@ exports.doesRuleExist = async (req, res) => {
   }
 };
 
-exports.updateRule = async (req, res) => {
+exports.updateRuleName = async (req, res) => {
   try {
-    const updatedRule = await rulesTableModel.findByIdAndUpdate(
+    const response = await rulesTableModel.findByIdAndUpdate(
       req.params.ruleId,
-      req.body,
+      { name: req.body.newRuleName },
       { new: true }
     );
+    res.status(200).json({ status: "success", data: response });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
 
-    res.status(200).json({ status: "success", data: updatedRule });
+exports.updateRuleCategory = async (req, res) => {
+  try {
+    const valuesToSet = {};
+    valuesToSet[`ruleCategories.$[category].name`] =
+      req.body.newRuleCategoryName;
+
+    const response = await rulesTableModel.findByIdAndUpdate(
+      req.params.ruleId,
+      { $set: valuesToSet },
+      {
+        new: true,
+        arrayFilters: [{ "category._id": req.params.ruleCategoryId }],
+      }
+    );
+    res.status(200).json({ status: "success", data: response });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
+exports.addRuleCategory = async (req, res) => {
+  try {
+    const response = await rulesTableModel.findByIdAndUpdate(
+      req.params.ruleId,
+      {
+        $push: { ruleCategories: { name: req.body.newRuleCategoryName } },
+      },
+      { new: true }
+    );
+    res.status(200).json({ status: "success", data: response });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
+exports.updateRuleInput = async (req, res) => {
+  try {
+    const valuesToSet = {};
+    valuesToSet[`ruleInputs.$[input].name`] = req.body.newRuleInputName;
+    valuesToSet[`ruleInputs.$[input].points`] = req.body.newRuleInputPoints;
+    const response = await rulesTableModel.findByIdAndUpdate(
+      req.params.ruleId,
+      {
+        $set: valuesToSet,
+      },
+      {
+        new: true,
+        arrayFilters: [{ "input._id": req.params.ruleInputId }],
+      }
+    );
+    res.status(200).json({ status: "success", data: response });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
+exports.addRuleInput = async (req, res) => {
+  try {
+    const response = await rulesTableModel.findByIdAndUpdate(
+      req.params.ruleId,
+      {
+        $push: {
+          ruleInputs: {
+            name: req.body.newRuleInputName,
+            points: req.body.newRuleInputPoints,
+            ruleCategoryId: req.body.ruleCategoryId,
+          },
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json({ status: "success", data: response });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
+exports.changeRuleInputOrder = async (req, res) => {
+  try {
+    const response = await rulesTableModel.findByIdAndUpdate(
+      req.params.ruleId,
+      { ruleInputs: req.body.newRuleInputs },
+      { new: true }
+    );
+    res.status(200).json({ status: "success", data: response });
   } catch (err) {
     console.error(err);
     res.status(400).json({ status: "fail", message: err.message });

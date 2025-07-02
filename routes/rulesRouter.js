@@ -9,15 +9,41 @@ router
   .post(authController.restrictTo("admin"), rulesController.createNewRule);
 
 router
-  .route("/rule-exists/:id")
-  .get(authController.restrictTo("admin"), rulesController.doesRuleExist);
+  .route("/get-rule/:id")
+  .get(authController.restrictTo("admin"), rulesController.getRule);
 
 router
   .route("/manage-rules")
   .get(authController.restrictTo("admin"), rulesController.getManageRules);
 
 router
-  .route("/:ruleId")
-  .patch(authController.restrictTo("admin"), rulesController.updateRule);
+  .route("/:ruleId/update-rule-name")
+  .patch(authController.restrictTo("admin"), rulesController.updateRuleName);
+
+router
+  .route("/:ruleId/update-rule-category/:ruleCategoryId")
+  .patch(
+    authController.restrictTo("admin"),
+    rulesController.updateRuleCategory
+  );
+
+router
+  .route("/:ruleId/add-rule-category")
+  .patch(authController.restrictTo("admin"), rulesController.addRuleCategory);
+
+router
+  .route("/:ruleId/update-rule-input/:ruleInputId")
+  .patch(authController.restrictTo("admin"), rulesController.updateRuleInput);
+
+router
+  .route("/:ruleId/add-rule-input")
+  .patch(authController.restrictTo("admin"), rulesController.addRuleInput);
+
+router
+  .route("/:ruleId/change-rule-input-order")
+  .patch(
+    authController.restrictTo("admin"),
+    rulesController.changeRuleInputOrder
+  );
 
 module.exports = router;

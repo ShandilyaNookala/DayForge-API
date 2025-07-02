@@ -51,12 +51,12 @@ module.exports = function computeNextDayWork(
         } else {
           for (let i = startIndex; i < rule.ruleInputs.length; i++) {
             sumPoints += points[i];
-            if (sumPoints > noOfProblems + threshold) {
-              sumPoints -= points[i];
+            if (sumPoints >= noOfProblems) {
+              if (sumPoints > noOfProblems + threshold) sumPoints -= points[i];
+              else indexesChecked.add(i);
               break;
             }
             indexesChecked.add(i);
-            if (sumPoints === noOfProblems) break;
           }
           returnedArr = rule.ruleInputs.map((ruleInput, i) => ({
             name: ruleInput.name,
