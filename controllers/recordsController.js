@@ -235,6 +235,28 @@ exports.updateRuleForTask = async (req, res) => {
   }
 };
 
+exports.updateSkippedRuleCategories = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { skippedRuleCategories } = req.body;
+    const updatedTask = await recordsTableModel.findByIdAndUpdate(
+      taskId,
+      { skippedRuleCategories },
+      { new: true }
+    );
+    res.status(200).json({
+      status: "success",
+      data: updatedTask,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 exports.getStudentTasks = async (req, res) => {
   try {
     const timezone = getIPLocationOfUser(req);
@@ -283,7 +305,7 @@ exports.getAutomaticDataWithMistakes = async (req, res) => {
       .findById(req.params.taskId, {
         records: { $elemMatch: { _id: req.params.recordId } },
       })
-      .select("rule threshold noOfProblems records")
+      .select("rule threshold noOfProblems records skippedRuleCategories")
       .populate("rule");
 
     const data = computeNextDayWork(
@@ -293,7 +315,8 @@ exports.getAutomaticDataWithMistakes = async (req, res) => {
       record.records[0].work,
       mistakes,
       record.noOfProblems,
-      record.threshold
+      record.threshold,
+      record.skippedRuleCategories || []
     );
 
     const arr = record.records[0].work;
@@ -387,6 +410,7 @@ exports.getAutomaticData = async (req, res) => {
           rule: 1,
           threshold: 1,
           noOfProblems: 1,
+          skippedRuleCategories: 1,
           records: { $elemMatch: { _id: recordId } },
         })
         .populate("rule");
@@ -400,6 +424,7 @@ exports.getAutomaticData = async (req, res) => {
             rule: 1,
             threshold: 1,
             noOfProblems: 1,
+            skippedRuleCategories: 1,
             records: { $slice: ["$records", -1] },
           },
         },
@@ -416,7 +441,8 @@ exports.getAutomaticData = async (req, res) => {
       recordAndRule = { ...result, records: result?.records[0] };
     }
 
-    const { rule, records, threshold, noOfProblems } = recordAndRule;
+    const { rule, records, threshold, noOfProblems, skippedRuleCategories } =
+      recordAndRule;
     let {
       work: currentWork,
       date: currentNextDate,
@@ -433,7 +459,8 @@ exports.getAutomaticData = async (req, res) => {
       currentWork,
       mistakes,
       noOfProblems,
-      threshold
+      threshold,
+      skippedRuleCategories || []
     );
 
     res.status(200).json({ status: "success", data });

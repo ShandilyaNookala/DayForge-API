@@ -48,6 +48,13 @@ router
   );
 
 router
+  .route("/update-skipped-rule-categories/:taskId")
+  .patch(
+    authController.restrictTo("admin"),
+    recordsController.updateSkippedRuleCategories
+  );
+
+router
   .route("/get-automatic-data/:taskId")
   .get(authController.restrictTo("admin"), recordsController.getAutomaticData);
 
