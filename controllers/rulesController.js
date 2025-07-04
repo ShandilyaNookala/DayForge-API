@@ -167,3 +167,29 @@ exports.getAllRules = async (req, res) => {
     res.status(400).json({ status: "fail", message: err.message });
   }
 };
+
+exports.getExistingRuleCategories = async (req, res) => {
+  try {
+    const task = await recordsTableModel
+      .findById(req.params.taskId)
+      .populate("rule", "ruleCategories");
+    const existingRuleCategories = task?.rule?.ruleCategories.map(
+      (ruleCategory) => {
+        return {
+          id: ruleCategory._id,
+          label: ruleCategory.name,
+          checked: !task.skippedRuleCategories.find((skippedRuleCategoryId) =>
+            skippedRuleCategoryId.equals(ruleCategory._id)
+          ),
+        };
+      }
+    );
+    res.status(200).json({
+      status: "success",
+      data: existingRuleCategories || [],
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};

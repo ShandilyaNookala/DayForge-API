@@ -48,4 +48,11 @@ router
 
 router.route("/get-all-rules").get(rulesController.getAllRules);
 
+router
+  .route("/get-existing-rule-categories/:taskId")
+  .get(
+    authController.restrictTo("admin"),
+    rulesController.getExistingRuleCategories
+  );
+
 module.exports = router;
