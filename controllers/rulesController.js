@@ -49,7 +49,7 @@ exports.updateRuleName = async (req, res) => {
   try {
     const response = await rulesTableModel.findByIdAndUpdate(
       req.params.ruleId,
-      { name: req.body.newRuleName },
+      { ruleName: req.body.newRuleName },
       { new: true }
     );
     res.status(200).json({ status: "success", data: response });
