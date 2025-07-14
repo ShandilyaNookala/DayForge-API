@@ -12,6 +12,7 @@ const computeNextDayGrade = require("../utils/computeNextDayGrade");
 const getPreviousAndNextTask = require("../utils/getPreviousAndNextTask");
 const getIPLocationOfUser = require("../utils/getIPLocationOfUser");
 const authController = require("./authController");
+const moment = require("moment-timezone");
 
 async function getCommonRecordsData(newRecords, req) {
   newRecords = newRecords.toObject();
@@ -30,20 +31,23 @@ async function getCommonRecordsData(newRecords, req) {
     newRecords.records[0].date,
     timezone
   )
-    ? newRecords.records[0].date
-    : getCurrentDate(timezone);
+    ? moment(newRecords.records[0].date).tz(timezone).toDate()
+    : moment(getCurrentDate(timezone)).toDate();
   let endNumberOfDays = 0;
-  let currentWork = [];
+  let currentWork =
+    Array.isArray(newRecords.records[0].result) && newRecords.records[0].grade
+      ? newRecords.records[0].work
+      : newRecords.records[1].work;
   while (1) {
     let { work: nextWorks } = computeNextDayWork(
       null,
-      this.rule,
+      newRecords.rule,
       true,
       currentWork,
       [],
-      this.noOfProblems,
-      this.threshold,
-      this.skippedRuleCategories
+      newRecords.noOfProblems,
+      newRecords.threshold,
+      newRecords.skippedRuleCategories
     );
     nextWorks = nextWorks?.filter((work) => work.checked);
     if (!nextWorks || nextWorks.length === 0) break;
