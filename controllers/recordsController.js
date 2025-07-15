@@ -12,7 +12,6 @@ const computeNextDayGrade = require("../utils/computeNextDayGrade");
 const getPreviousAndNextTask = require("../utils/getPreviousAndNextTask");
 const getIPLocationOfUser = require("../utils/getIPLocationOfUser");
 const authController = require("./authController");
-const moment = require("moment-timezone");
 
 async function getCommonRecordsData(newRecords, req) {
   newRecords = newRecords.toObject();
@@ -21,18 +20,13 @@ async function getCommonRecordsData(newRecords, req) {
     newRecords.records.length === 0 ||
     !newRecords.rule
   )
-    return null;
+    return newRecords;
   const timezone = getIPLocationOfUser(req);
   const { previousTask, nextTask } = await getPreviousAndNextTask(
     newRecords._id
   );
 
-  const lastRecordDate = isDateGreaterThanOrEqualToToday(
-    newRecords.records[0].date,
-    timezone
-  )
-    ? moment(newRecords.records[0].date).tz(timezone).toDate()
-    : moment(getCurrentDate(timezone)).toDate();
+  const lastRecordDate = new Date(newRecords.records[0]?.date);
   let endNumberOfDays = 0;
   let currentWork =
     Array.isArray(newRecords.records[0].result) && newRecords.records[0].grade
