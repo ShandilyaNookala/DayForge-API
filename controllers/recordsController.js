@@ -9,16 +9,20 @@ const mongoose = require("mongoose");
 const compareDates = require("../utils/compareDates");
 const computeNextDayWork = require("../utils/computeNextDayWork");
 const computeNextDayGrade = require("../utils/computeNextDayGrade");
-const getPreviousAndNextTask = require("../utils/getPreviousAndNextTask");
 const getIPLocationOfUser = require("../utils/getIPLocationOfUser");
 const authController = require("./authController");
 
 async function getCommonRecordsData(newRecords, req) {
-  const timezone = getIPLocationOfUser(req);
-  const { previousTask, nextTask } = await getPreviousAndNextTask(
-    newRecords._id
-  );
   newRecords = newRecords.toObject();
+  const timezone = getIPLocationOfUser(req);
+
+  const positions = await positionsTableModel.findOne({
+    tasks: { $in: [new mongoose.Types.ObjectId(newRecords._id)] },
+  });
+  const indexOfTask = positions.tasks.indexOf(newRecords._id);
+  const previousTask = positions.tasks[indexOfTask - 1];
+  const nextTask = positions.tasks[indexOfTask + 1];
+
   newRecords.records.forEach((record) => {
     record.isEditable = isDateGreaterThanOrEqualToToday(record.date, timezone);
     record.isResultsMovable =
@@ -33,7 +37,7 @@ async function getCommonRecordsData(newRecords, req) {
       !record.endTime;
   });
   newRecords.rule = newRecords.rule?._id;
-  return { newRecords, previousTask, nextTask };
+  return { ...newRecords, previousTask, nextTask };
 }
 
 function canMarkObsolete(currentRecord) {
@@ -67,23 +71,10 @@ exports.getRecords = async (req, res) => {
         message: "You do not have permission to access these records.",
       });
     }
-    const { newRecords, previousTask, nextTask } = await getCommonRecordsData(
-      response,
-      req
-    );
 
-    newRecords.rule = newRecords.rule?._id;
     res.status(200).json({
       status: "success",
-      data: {
-        ...newRecords,
-        records: newRecords.records.map((record, index) => ({
-          ...record,
-          number: index + 1,
-        })),
-        previousTask,
-        nextTask,
-      },
+      data: await getCommonRecordsData(response, req),
     });
   } catch (err) {
     console.error(err);
@@ -153,14 +144,9 @@ exports.updateOrCreateRecordInArray = async (req, res) => {
       }
     }
 
-    const {
-      newRecords: updatedRecords,
-      previousTask,
-      nextTask,
-    } = await getCommonRecordsData(newRecords, req);
     res.status(200).json({
       status: "success",
-      data: { ...updatedRecords, previousTask, nextTask },
+      data: await getCommonRecordsData(newRecords, req),
     });
   } catch (err) {
     console.error(err);
@@ -199,10 +185,16 @@ exports.updateManageRules = async (req, res) => {
 exports.updateThresholdPoints = async (req, res) => {
   try {
     const taskId = req.params.taskId;
-    await recordsTableModel.findByIdAndUpdate(taskId, req.body);
+    const response = await recordsTableModel
+      .findByIdAndUpdate(taskId, {
+        threshold: req.body.threshold,
+        noOfProblems: req.body.noOfProblems,
+      })
+      .populate("rule");
+
     res.status(200).json({
       status: "success",
-      message: "Threshold and points updated successfully",
+      data: await getCommonRecordsData(response, req),
     });
   } catch (err) {
     console.error(err);
@@ -217,14 +209,13 @@ exports.updateRuleForTask = async (req, res) => {
   try {
     const taskId = req.params.taskId;
     const ruleId = req.body.ruleId;
-    const updatedTask = await recordsTableModel.findByIdAndUpdate(
-      taskId,
-      { rule: ruleId },
-      { new: true }
-    );
+    const updatedTask = await recordsTableModel
+      .findByIdAndUpdate(taskId, { rule: ruleId }, { new: true })
+      .populate("rule");
+
     res.status(200).json({
       status: "success",
-      data: updatedTask,
+      data: await getCommonRecordsData(updatedTask, req),
     });
   } catch (err) {
     console.error(err);
@@ -239,14 +230,13 @@ exports.updateSkippedRuleCategories = async (req, res) => {
   try {
     const taskId = req.params.taskId;
     const { skippedRuleCategories } = req.body;
-    const updatedTask = await recordsTableModel.findByIdAndUpdate(
-      taskId,
-      { skippedRuleCategories },
-      { new: true }
-    );
+    const updatedTask = await recordsTableModel
+      .findByIdAndUpdate(taskId, { skippedRuleCategories }, { new: true })
+      .populate("rule");
+
     res.status(200).json({
       status: "success",
-      data: updatedTask,
+      data: await getCommonRecordsData(updatedTask, req),
     });
   } catch (err) {
     console.error(err);
@@ -377,9 +367,11 @@ exports.addRecord = async (req, res) => {
   }
 };
 
-exports.updateValueInRecord = async (req, res) => {
+exports.updateTaskName = async (req, res) => {
   try {
-    await recordsTableModel.findByIdAndUpdate(req.params.taskId, req.body);
+    await recordsTableModel.findByIdAndUpdate(req.params.taskId, {
+      taskName: req.body.taskName,
+    });
     const allPositions = await aggregatePositions();
     res.status(200).json({
       status: "success",

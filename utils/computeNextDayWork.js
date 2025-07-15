@@ -30,7 +30,6 @@ module.exports = function computeNextDayWork(
         )
         .map((input) => String(input._id))
     );
-    console.log(skippedRuleInputsSet);
 
     const indexWork = currentWork.map((work) =>
       ruleInputsMap.get(String(work._id))
