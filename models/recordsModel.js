@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const getGrades = require("../utils/getGrades");
+const computeNextDayWork = require("../utils/computeNextDayWork");
 
 const recordSchema = mongoose.Schema({
   date: { type: Date, required: [true, "The records must have a date."] },
@@ -123,6 +124,35 @@ recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
 
 recordsTableSchema.virtual("mistakes").get(function () {
   return getSummaryProblems.call(this, "result");
+});
+
+recordsTableSchema.virtual("endDate").get(function () {
+  const lastRecordDate = new Date(this.records[0]?.date);
+  let endNumberOfDays = 0;
+  let currentWork = this.records[0]?.work;
+  let index = 0;
+  while (1) {
+    let { work: nextWorks } = computeNextDayWork(
+      null,
+      this.rule,
+      true,
+      currentWork,
+      index === 0 ? this.records[0]?.result : null,
+      this.noOfProblems,
+      this.threshold,
+      this.skippedRuleCategories
+    );
+    nextWorks = nextWorks?.filter((work) => work.checked);
+    if (!nextWorks || nextWorks.length === 0) break;
+    currentWork = nextWorks.map((work) => {
+      return { _id: work.id };
+    });
+    endNumberOfDays++;
+    index++;
+  }
+  return new Date(
+    lastRecordDate.getTime() + endNumberOfDays * 24 * 60 * 60 * 1000
+  );
 });
 
 recordsTableSchema.post(/^find/, function (docs, next) {

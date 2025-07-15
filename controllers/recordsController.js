@@ -9,52 +9,19 @@ const mongoose = require("mongoose");
 const compareDates = require("../utils/compareDates");
 const computeNextDayWork = require("../utils/computeNextDayWork");
 const computeNextDayGrade = require("../utils/computeNextDayGrade");
-const getPreviousAndNextTask = require("../utils/getPreviousAndNextTask");
 const getIPLocationOfUser = require("../utils/getIPLocationOfUser");
 const authController = require("./authController");
 
 async function getCommonRecordsData(newRecords, req) {
   newRecords = newRecords.toObject();
-  if (
-    !newRecords.records ||
-    newRecords.records.length === 0 ||
-    !newRecords.rule
-  )
-    return newRecords;
   const timezone = getIPLocationOfUser(req);
-  const { previousTask, nextTask } = await getPreviousAndNextTask(
-    newRecords._id
-  );
 
-  const lastRecordDate = newRecords.records[0]
-    ? new Date(newRecords.records[0]?.date)
-    : new Date();
-  let endNumberOfDays = 0;
-  let currentWork =
-    Array.isArray(newRecords.records[0].result) && newRecords.records[0].grade
-      ? newRecords.records[0].work
-      : newRecords.records[1].work;
-  while (1) {
-    let { work: nextWorks } = computeNextDayWork(
-      null,
-      newRecords.rule,
-      true,
-      currentWork,
-      [],
-      newRecords.noOfProblems,
-      newRecords.threshold,
-      newRecords.skippedRuleCategories
-    );
-    nextWorks = nextWorks?.filter((work) => work.checked);
-    if (!nextWorks || nextWorks.length === 0) break;
-    currentWork = nextWorks.map((work) => {
-      return { _id: work.id };
-    });
-    endNumberOfDays++;
-  }
-  const endDate = new Date(
-    lastRecordDate.getTime() + endNumberOfDays * 24 * 60 * 60 * 1000
-  );
+  const positions = await positionsTableModel.findOne({
+    tasks: { $in: [new mongoose.Types.ObjectId(newRecords._id)] },
+  });
+  const indexOfTask = positions.tasks.indexOf(newRecords._id);
+  const previousTask = positions.tasks[indexOfTask - 1];
+  const nextTask = positions.tasks[indexOfTask + 1];
 
   newRecords.records.forEach((record) => {
     record.isEditable = isDateGreaterThanOrEqualToToday(record.date, timezone);
@@ -70,7 +37,7 @@ async function getCommonRecordsData(newRecords, req) {
       !record.endTime;
   });
   newRecords.rule = newRecords.rule?._id;
-  return { ...newRecords, previousTask, nextTask, endDate };
+  return { ...newRecords, previousTask, nextTask };
 }
 
 function canMarkObsolete(currentRecord) {
