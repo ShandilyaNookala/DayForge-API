@@ -86,7 +86,7 @@ exports.restrictTo = (...roles) => {
       next();
     } catch (err) {
       console.error(err);
-      res.status(401).json({
+      res.status(403).json({
         status: "fail",
         message: err.message,
       });
