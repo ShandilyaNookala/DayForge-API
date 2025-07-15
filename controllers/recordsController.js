@@ -26,7 +26,9 @@ async function getCommonRecordsData(newRecords, req) {
     newRecords._id
   );
 
-  const lastRecordDate = new Date(newRecords.records[0]?.date);
+  const lastRecordDate = newRecords.records[0]
+    ? new Date(newRecords.records[0]?.date)
+    : new Date();
   let endNumberOfDays = 0;
   let currentWork =
     Array.isArray(newRecords.records[0].result) && newRecords.records[0].grade
