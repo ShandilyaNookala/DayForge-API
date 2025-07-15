@@ -59,11 +59,8 @@ router
   .get(authController.restrictTo("admin"), recordsController.getAutomaticData);
 
 router
-  .route("/:taskId")
-  .patch(
-    authController.restrictTo("admin"),
-    recordsController.updateValueInRecord
-  );
+  .route("/update-task-name/:taskId")
+  .patch(authController.restrictTo("admin"), recordsController.updateTaskName);
 router
   .route("/")
   .post(authController.restrictTo("admin"), recordsController.addRecord);
