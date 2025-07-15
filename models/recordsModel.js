@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 
 const getGrades = require("../utils/getGrades");
-const computeNextDayWork = require("../utils/computeNextDayWork");
-const getCurrentDate = require("../utils/getCurrentDate");
 
 const recordSchema = mongoose.Schema({
   date: { type: Date, required: [true, "The records must have a date."] },
@@ -126,8 +124,6 @@ recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
 recordsTableSchema.virtual("mistakes").get(function () {
   return getSummaryProblems.call(this, "result");
 });
-
-recordsTableSchema.virtual("endDate").get(function () {});
 
 recordsTableSchema.post(/^find/, function (docs, next) {
   if (Array.isArray(docs)) {
