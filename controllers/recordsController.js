@@ -442,7 +442,7 @@ exports.getAutomaticData = async (req, res) => {
     } = records || {};
     const isAdding = !recordId;
 
-    const nextDate = isAdding ? getNextDate(timezone) : currentNextDate;
+    const nextDate = isAdding ? getCurrentDate(timezone) : currentNextDate;
 
     const data = computeNextDayWork(
       nextDate,
