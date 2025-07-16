@@ -79,9 +79,9 @@ function getNewRecords(records, rule) {
     .reverse();
 }
 
-function getSummaryProblems(field) {
-  if (!this.rule) return null;
-  return new Set(
+function getSummaryProblems(field, includePoints = false) {
+  if (!this.rule || !this.rule.ruleInputs) return null;
+  const set = new Set(
     this.records
       ?.filter(
         (record) =>
@@ -93,7 +93,11 @@ function getSummaryProblems(field) {
       .flatMap((record) =>
         record[field].map((fieldUnit) => String(fieldUnit._id))
       )
-  ).size;
+  );
+  if (!includePoints) return set.size;
+  return this.rule.ruleInputs
+    .filter((ruleInput) => set.has(String(ruleInput._id)))
+    .reduce((acc, ruleInput) => acc + ruleInput.points, 0);
 }
 
 recordSchema.virtual("timeTaken").get(function () {
@@ -124,6 +128,15 @@ recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
 
 recordsTableSchema.virtual("mistakes").get(function () {
   return getSummaryProblems.call(this, "result");
+});
+
+recordsTableSchema.virtual("percentageCorrect").get(function () {
+  return (
+    (1 -
+      getSummaryProblems.call(this, "result", true) /
+        getSummaryProblems.call(this, "work", true)) *
+    100
+  );
 });
 
 recordsTableSchema.virtual("endDate").get(function () {
