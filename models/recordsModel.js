@@ -139,6 +139,24 @@ recordsTableSchema.virtual("percentageCorrect").get(function () {
   );
 });
 
+recordsTableSchema.virtual("totalPoints").get(function () {
+  if (!this.rule || !this.rule.ruleInputs) return null;
+  return this.rule.ruleInputs.reduce(
+    (acc, ruleInput) => acc + ruleInput.points,
+    0
+  );
+});
+
+recordsTableSchema.virtual("totalPointsAttempted").get(function () {
+  if (!this.rule || !this.rule.ruleInputs) return null;
+  return getSummaryProblems.call(this, "work", true);
+});
+
+recordsTableSchema.virtual("mistakePoints").get(function () {
+  if (!this.rule || !this.rule.ruleInputs) return null;
+  return getSummaryProblems.call(this, "result", true);
+});
+
 recordsTableSchema.virtual("endDate").get(function () {
   if (!this.records) return null;
   const lastRecordDate = new Date(this.records[0]?.date);
