@@ -154,6 +154,22 @@ exports.changeRuleInputOrder = async (req, res) => {
   }
 };
 
+exports.bulkEditPoints = async (req, res) => {
+  try {
+    const rule = await rulesTableModel.findById(req.params.ruleId);
+    rule.ruleInputs.forEach((ruleInput) => {
+      if (ruleInput.ruleCategoryId.toString() === req.params.ruleCategoryId) {
+        ruleInput.points = +req.body.bulkEditPoints;
+      }
+    });
+    await rule.save();
+    res.status(200).json({ status: "success", data: rule });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ status: "fail", message: err.message });
+  }
+};
+
 exports.getAllRules = async (req, res) => {
   try {
     const rules = (await rulesTableModel.find().select("ruleName")).map(
