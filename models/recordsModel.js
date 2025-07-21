@@ -159,7 +159,9 @@ recordsTableSchema.virtual("mistakePoints").get(function () {
 
 recordsTableSchema.virtual("endDate").get(function () {
   if (!this.records) return null;
-  const lastRecordDate = new Date(this.records[0]?.date);
+  const lastRecordDate = this.records[0]
+    ? new Date(this.records[0]?.date)
+    : new Date();
   let endNumberOfDays = 0;
   let currentWork = this.records[0]?.work;
   let index = 0;

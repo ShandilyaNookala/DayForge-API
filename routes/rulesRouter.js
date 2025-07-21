@@ -46,6 +46,10 @@ router
     rulesController.changeRuleInputOrder
   );
 
+router
+  .route("/:ruleId/bulk-edit-points/:ruleCategoryId")
+  .patch(authController.restrictTo("admin"), rulesController.bulkEditPoints);
+
 router.route("/get-all-rules").get(rulesController.getAllRules);
 
 router
