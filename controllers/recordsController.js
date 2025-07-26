@@ -186,10 +186,14 @@ exports.updateThresholdPoints = async (req, res) => {
   try {
     const taskId = req.params.taskId;
     const response = await recordsTableModel
-      .findByIdAndUpdate(taskId, {
-        threshold: req.body.threshold,
-        noOfProblems: req.body.noOfProblems,
-      })
+      .findByIdAndUpdate(
+        taskId,
+        {
+          threshold: req.body.threshold,
+          noOfProblems: req.body.noOfProblems,
+        },
+        { new: true }
+      )
       .populate("rule");
 
     res.status(200).json({
