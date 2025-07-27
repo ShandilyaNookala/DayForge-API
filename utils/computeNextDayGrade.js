@@ -6,7 +6,7 @@ module.exports = function computeNextDayGrade(
   const weightedSum = weightedMistakes.reduce((acc, curr) => acc + curr, 0);
   const sum = currentWork.reduce(
     (acc, cur, i) =>
-      mistakes.includes(String(cur._id)) ? acc + weightedMistakes[i] : acc,
+      mistakes?.includes(String(cur._id)) ? acc + weightedMistakes[i] : acc,
     0.0
   );
   const percentCorrect =
