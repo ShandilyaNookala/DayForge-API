@@ -8,6 +8,7 @@ module.exports = function computeNextDayWork(
   threshold,
   skippedRuleCategories
 ) {
+  const idsOfMistakes = mistakes?.map((mistake) => mistake._id);
   const data = {
     nextDate,
     work: null,
@@ -39,12 +40,15 @@ module.exports = function computeNextDayWork(
 
       let sumPoints = 0;
       Array.isArray(mistakes) &&
-        mistakes?.forEach((mistakeId) => {
-          if (skippedRuleInputsSet.has(mistakeId)) return;
-          const index = ruleInputsMap.get(mistakeId);
-          if (index !== undefined) {
-            indexesChecked.add(index);
-            sumPoints += rule.ruleInputs[index].points;
+        mistakes?.forEach((mistake) => {
+          if (skippedRuleInputsSet.has(String(mistake.id))) return;
+          const index = ruleInputsMap.get(String(mistake.id));
+          if (mistake.shouldRepeat) {
+            if (index !== undefined) {
+              indexesChecked.add(index);
+              if (!mistake.addMistakes)
+                sumPoints += rule.ruleInputs[index].points;
+            }
           }
         });
 
@@ -55,7 +59,7 @@ module.exports = function computeNextDayWork(
         if (startIndex >= rule.ruleInputs.length) {
           returnedArr = rule.ruleInputs.map((ruleInput) => ({
             name: ruleInput.name,
-            checked: mistakes?.some(
+            checked: idsOfMistakes?.some(
               (mistakeId) =>
                 mistakeId === String(ruleInput._id) &&
                 !skippedRuleInputsSet.has(mistakeId)
