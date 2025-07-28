@@ -159,6 +159,7 @@ recordsTableSchema.virtual("mistakePoints").get(function () {
 
 recordsTableSchema.virtual("endDate").get(function () {
   if (!this.records) return null;
+  if (!this.rule || !this.rule.ruleInputs) return null;
   const lastRecordDate = this.records[0]
     ? new Date(this.records[0]?.date)
     : new Date();
