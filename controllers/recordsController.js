@@ -323,7 +323,7 @@ exports.getAutomaticDataWithMistakes = async (req, res) => {
 
       data.grade = computeNextDayGrade(
         record.records[0].work,
-        mistakes,
+        mistakes.map((el) => el.id),
         weightedMistakes
       );
     }
