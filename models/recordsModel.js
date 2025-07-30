@@ -160,9 +160,10 @@ recordsTableSchema.virtual("mistakePoints").get(function () {
 recordsTableSchema.virtual("endDate").get(function () {
   if (!this.records) return null;
   if (!this.rule || !this.rule.ruleInputs) return null;
+  if (!this.noOfProblems) return null;
   const lastRecordDate = this.records[0]
     ? new Date(this.records[0]?.date)
-    : new Date();
+    : new Date(Date.now() - 86400000);
   let endNumberOfDays = 0;
   let currentWork = this.records[0]?.work;
   let index = 0;
