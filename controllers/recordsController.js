@@ -302,6 +302,8 @@ exports.getAutomaticDataWithMistakes = async (req, res) => {
       .select("rule threshold noOfProblems records skippedRuleCategories")
       .populate("rule");
 
+    if (!mistakes) return null;
+
     const data = computeNextDayWork(
       null,
       record.rule,
