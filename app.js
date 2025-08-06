@@ -61,19 +61,11 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/", integrationRouter);
 
-// Handle unmatched routes
-app.all("*", (req, res, next) => {
-  const err = new Error("Not Found");
-  err.statusCode = 404;
-  next(err);
-});
-
-// Global error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err);
-  const statusCode = err.statusCode || 500;
-  const status = `${statusCode}`.startsWith("4") ? "fail" : "error";
-  const message = statusCode === 500 ? "Internal server error" : err.message;
+  const statusCode = 400;
+  const status = "fail";
+  const message = err.message;
   res.status(statusCode).json({
     status,
     message,

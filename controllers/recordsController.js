@@ -57,7 +57,7 @@ function isDateGreaterThanOrEqualToToday(date, timezone) {
   );
 }
 
-exports.getRecords = catchAsync(async (req, res, next) => {
+exports.getRecords = catchAsync(async (req, res) => {
   const response = await recordsTableModel
     .findById(req.params.id)
     .populate("rule");
