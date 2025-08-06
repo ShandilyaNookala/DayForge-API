@@ -61,4 +61,13 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/", integrationRouter);
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({
+    status: "fail",
+    message: err.message,
+  });
+});
+
 exports.dayForgeAPI = app;
