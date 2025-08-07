@@ -61,7 +61,7 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/", integrationRouter);
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error(err);
   const statusCode = 400;
   const status = "fail";
