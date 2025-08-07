@@ -14,7 +14,8 @@ const authController = require("./authController");
 const catchAsync = require("../utils/catchAsync");
 
 async function getCommonRecordsData(newRecords, req) {
-  newRecords = newRecords.toObject();
+  if (!newRecords) return null;
+  newRecords = newRecords?.toObject();
   const timezone = getIPLocationOfUser(req);
 
   const positions = await positionsTableModel.findOne({
@@ -90,7 +91,12 @@ exports.updateOrCreateRecordInArray = catchAsync(async (req, res, next) => {
   }
 
   if (req.body.result !== null && req.body.result !== undefined) {
-    authController.restrictTo("admin")(req, res, next);
+    if (!req.user.role || req.user.role !== "admin") {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission to perform this action",
+      });
+    }
   }
   const { recordId } = req.params;
   const keysToConvertToObjectId = ["work", "result", "nextWork"];
