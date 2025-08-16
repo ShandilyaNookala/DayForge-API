@@ -61,4 +61,15 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/", integrationRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  const statusCode = 400;
+  const status = "fail";
+  const message = err.message;
+  res.status(statusCode).json({
+    status,
+    message,
+  });
+});
+
 exports.dayForgeAPI = app;
