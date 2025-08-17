@@ -9,7 +9,6 @@ module.exports = function computeNextDayWork(
   skippedRuleCategories
 ) {
   const idsOfMistakes = mistakes?.map((mistake) => mistake.id);
-
   const data = {
     nextDate,
     work: null,
