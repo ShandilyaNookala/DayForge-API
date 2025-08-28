@@ -10,7 +10,6 @@ const compareDates = require("../utils/compareDates");
 const computeNextDayWork = require("../utils/computeNextDayWork");
 const computeNextDayGrade = require("../utils/computeNextDayGrade");
 const getIPLocationOfUser = require("../utils/getIPLocationOfUser");
-const authController = require("./authController");
 const catchAsync = require("../utils/catchAsync");
 
 async function getCommonRecordsData(newRecords, req) {
@@ -79,7 +78,7 @@ exports.getRecords = catchAsync(async (req, res) => {
   });
 });
 
-exports.updateOrCreateRecordInArray = catchAsync(async (req, res, next) => {
+exports.updateOrCreateRecordInArray = catchAsync(async (req, res) => {
   async function addRecordToArray(data) {
     return await recordsTableModel
       .findByIdAndUpdate(
