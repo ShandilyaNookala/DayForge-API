@@ -125,6 +125,19 @@ exports.updateStandardPoints = catchAsync(async (req, res) => {
   });
   await rule.save();
   res.status(200).json({ status: "success", data: rule });
+  const response = await rulesTableModel.findByIdAndUpdate(
+    req.params.ruleId,
+    {
+      $set: {
+        "ruleCategories.$[category].standardPoints": +req.body.standardPoints,
+      },
+    },
+    {
+      new: true,
+      arrayFilters: [{ "category._id": req.params.ruleCategoryId }],
+    }
+  );
+  res.status(200).json({ status: "success", data: response });
 });
 
 exports.getAllRules = catchAsync(async (req, res) => {
