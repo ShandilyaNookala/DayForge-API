@@ -118,13 +118,6 @@ exports.bulkEditPoints = catchAsync(async (req, res) => {
 });
 
 exports.updateStandardPoints = catchAsync(async (req, res) => {
-  const rule = await rulesTableModel.findById(req.params.ruleId);
-  rule.ruleCategories.forEach((ruleCategory) => {
-    if (ruleCategory._id.toString() === req.params.ruleCategoryId)
-      ruleCategory.standardPoints = +req.body.standardPoints;
-  });
-  await rule.save();
-  res.status(200).json({ status: "success", data: rule });
   const response = await rulesTableModel.findByIdAndUpdate(
     req.params.ruleId,
     {
