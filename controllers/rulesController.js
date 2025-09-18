@@ -39,8 +39,7 @@ exports.updateRuleName = catchAsync(async (req, res) => {
 
 exports.updateRuleCategory = catchAsync(async (req, res) => {
   const valuesToSet = {};
-  valuesToSet[`ruleCategories.$[category].name`] =
-    req.body.newRuleCategoryName;
+  valuesToSet[`ruleCategories.$[category].name`] = req.body.newRuleCategoryName;
 
   const response = await rulesTableModel.findByIdAndUpdate(
     req.params.ruleId,
@@ -116,6 +115,22 @@ exports.bulkEditPoints = catchAsync(async (req, res) => {
   });
   await rule.save();
   res.status(200).json({ status: "success", data: rule });
+});
+
+exports.updateStandardPoints = catchAsync(async (req, res) => {
+  const response = await rulesTableModel.findByIdAndUpdate(
+    req.params.ruleId,
+    {
+      $set: {
+        "ruleCategories.$[category].standardPoints": +req.body.standardPoints,
+      },
+    },
+    {
+      new: true,
+      arrayFilters: [{ "category._id": req.params.ruleCategoryId }],
+    }
+  );
+  res.status(200).json({ status: "success", data: response });
 });
 
 exports.getAllRules = catchAsync(async (req, res) => {

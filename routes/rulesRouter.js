@@ -50,6 +50,13 @@ router
   .route("/:ruleId/bulk-edit-points/:ruleCategoryId")
   .patch(authController.restrictTo("admin"), rulesController.bulkEditPoints);
 
+router
+  .route("/:ruleId/update-standard-points/:ruleCategoryId")
+  .patch(
+    authController.restrictTo("admin"),
+    rulesController.updateStandardPoints
+  );
+
 router.route("/get-all-rules").get(rulesController.getAllRules);
 
 router

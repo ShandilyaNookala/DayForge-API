@@ -28,6 +28,10 @@ const rulesTableSchema = mongoose.Schema({
           type: String,
           required: [true, "Rule category must have a name"],
         },
+        standardPoints: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
     default: [],
