@@ -1,3 +1,5 @@
+const Decimal = require("decimal.js");
+
 module.exports = function computeNextDayWork(
   nextDate,
   rule,
@@ -40,9 +42,10 @@ module.exports = function computeNextDayWork(
       ruleInputsMap.get(String(work?._id))
     );
     if (isAdding) {
+      noOfProblems = new Decimal(noOfProblems);
       indexWork.sort((a, b) => a - b);
 
-      let sumPoints = 0;
+      let sumPoints = new Decimal(0);
       Array.isArray(mistakes) &&
         mistakes?.forEach((mistake) => {
           const mistakeId = String(mistake.id);
@@ -52,13 +55,13 @@ module.exports = function computeNextDayWork(
             if (index !== undefined) {
               indexesChecked.add(index);
               if (!mistake.addMistakes)
-                sumPoints += rule.ruleInputs[index].points;
+                sumPoints = sumPoints.add(rule.ruleInputs[index].points);
             }
           }
         });
 
       const points = rule.ruleInputs.map((input) => input.points);
-      if (sumPoints < noOfProblems) {
+      if (sumPoints.lessThan(noOfProblems)) {
         const startIndex =
           indexWork.length !== 0 ? indexWork[indexWork.length - 1] + 1 : 0;
         if (startIndex >= rule.ruleInputs.length) {
@@ -73,9 +76,10 @@ module.exports = function computeNextDayWork(
           for (let i = startIndex; i < rule.ruleInputs.length; i++) {
             if (skippedRuleInputsSet.has(String(rule.ruleInputs[i]._id)))
               continue;
-            sumPoints += points[i];
-            if (sumPoints >= noOfProblems) {
-              if (sumPoints > noOfProblems + threshold) sumPoints -= points[i];
+            sumPoints = sumPoints.add(points[i]);
+            if (sumPoints.greaterThanOrEqualTo(noOfProblems)) {
+              if (sumPoints.greaterThan(noOfProblems.add(threshold)))
+                sumPoints = sumPoints.sub(points[i]);
               else indexesChecked.add(i);
               break;
             }
