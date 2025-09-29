@@ -39,7 +39,7 @@ module.exports = function computeNextDayWork(
     );
 
     const indexWork = currentWork.map((work) =>
-      ruleInputsMap.get(String(work._id))
+      ruleInputsMap.get(String(work?._id))
     );
     if (isAdding) {
       noOfProblems = new Decimal(noOfProblems);
