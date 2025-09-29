@@ -91,7 +91,7 @@ function getSummaryProblems(field, includePoints = false) {
           record.grade !== 1
       )
       .flatMap((record) =>
-        record[field].map((fieldUnit) => String(fieldUnit._id))
+        record[field].map((fieldUnit) => String(fieldUnit?._id))
       )
   );
   if (!includePoints) return set.size;

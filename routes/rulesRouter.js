@@ -57,6 +57,10 @@ router
     rulesController.updateStandardPoints
   );
 
+router
+  .route("/:ruleId/delete-rule-input/:ruleInputId")
+  .delete(authController.restrictTo("admin"), rulesController.deleteRuleInput);
+
 router.route("/get-all-rules").get(rulesController.getAllRules);
 
 router

@@ -2,6 +2,7 @@ const recordsTableModel = require("../models/recordsModel");
 const rulesTableModel = require("../models/rulesModel");
 const getManagedRules = require("../utils/getManagedRules");
 const catchAsync = require("../utils/catchAsync");
+const { default: mongoose } = require("mongoose");
 
 exports.createNewRule = catchAsync(async (req, res) => {
   const newRule = await rulesTableModel.create(req.body);
@@ -131,6 +132,35 @@ exports.updateStandardPoints = catchAsync(async (req, res) => {
     }
   );
   res.status(200).json({ status: "success", data: response });
+});
+
+exports.deleteRuleInput = catchAsync(async (req, res) => {
+  const { ruleId, ruleInputId } = req.params;
+  const oid = new mongoose.Types.ObjectId(ruleInputId);
+
+  await recordsTableModel.updateMany(
+    { rule: ruleId },
+    {
+      $pull: {
+        "records.$[recWork].work": oid,
+        "records.$[recResult].result": oid,
+      },
+    },
+    {
+      arrayFilters: [
+        { "recWork.work": { $type: "array" } },
+        { "recResult.result": { $type: "array" } },
+      ],
+    }
+  );
+
+  const updatedRule = await rulesTableModel.findByIdAndUpdate(
+    ruleId,
+    { $pull: { ruleInputs: { _id: oid } } },
+    { new: true }
+  );
+
+  res.status(200).json({ status: "success", data: updatedRule });
 });
 
 exports.getAllRules = catchAsync(async (req, res) => {
