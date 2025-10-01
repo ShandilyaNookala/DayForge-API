@@ -126,6 +126,13 @@ recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
   return getSummaryProblems.call(this, "work");
 });
 
+recordsTableSchema.virtual("percentageCompleted").get(function () {
+  return this.rule
+    ? (getSummaryProblems.call(this, "work") / this.rule?.ruleInputs?.length) *
+        100
+    : null;
+});
+
 recordsTableSchema.virtual("mistakes").get(function () {
   return getSummaryProblems.call(this, "result");
 });
