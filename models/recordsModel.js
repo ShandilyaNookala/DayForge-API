@@ -127,14 +127,15 @@ recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
 });
 
 recordsTableSchema.virtual("percentageCompleted").get(function () {
-  return this.rule
-    ? (getSummaryProblems.call(this, "work", true) /
-        this.rule.ruleInputs.reduce(
-          (acc, ruleInput) => acc + ruleInput.points,
-          0
-        )) *
-        100
-    : null;
+  if (!this.rule || !this.rule.ruleInputs) return null;
+  return (
+    (getSummaryProblems.call(this, "work", true) /
+      this.rule.ruleInputs.reduce(
+        (acc, ruleInput) => acc + ruleInput.points,
+        0
+      )) *
+    100
+  );
 });
 
 recordsTableSchema.virtual("mistakes").get(function () {
