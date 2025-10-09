@@ -128,7 +128,11 @@ recordsTableSchema.virtual("totalAttemptedProblems").get(function () {
 
 recordsTableSchema.virtual("percentageCompleted").get(function () {
   return this.rule
-    ? (getSummaryProblems.call(this, "work") / this.rule?.ruleInputs?.length) *
+    ? (getSummaryProblems.call(this, "work", true) /
+        this.rule.ruleInputs.reduce(
+          (acc, ruleInput) => acc + ruleInput.points,
+          0
+        )) *
         100
     : null;
 });
