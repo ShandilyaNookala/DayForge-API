@@ -14,7 +14,7 @@ steps:
 
 substitutions:
   _PROJECT_ID: "allprojects-424621"
-  _REGION: "us-central1"
+  _REGION: "us-west3"
   _FUNCTION_NAME: "dayforge-function"
   _ENTRY_POINT: "dayForgeAPI"
 
