@@ -83,7 +83,6 @@ module.exports = function computeNextDayWork(
               else indexesChecked.add(i);
               break;
             }
-
             indexesChecked.add(i);
           }
           returnedArr = rule.ruleInputs.map((ruleInput, i) => ({
