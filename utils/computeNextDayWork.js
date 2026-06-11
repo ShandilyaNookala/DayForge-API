@@ -8,12 +8,12 @@ module.exports = function computeNextDayWork(
   mistakes,
   noOfProblems,
   threshold,
-  skippedRuleCategories
+  skippedRuleCategories,
 ) {
   const repeatableMistakeIds = new Set(
     (Array.isArray(mistakes) ? mistakes : [])
       .filter((mistake) => mistake && mistake.shouldRepeat)
-      .map((mistake) => String(mistake.id))
+      .map((mistake) => String(mistake.id)),
   );
   const data = {
     nextDate,
@@ -26,20 +26,20 @@ module.exports = function computeNextDayWork(
 
     const indexesChecked = new Set();
     const ruleInputsMap = new Map(
-      rule.ruleInputs.map((obj, index) => [String(obj._id), index])
+      rule.ruleInputs.map((obj, index) => [String(obj._id), index]),
     );
 
     const skippedRuleCategoriesSet = new Set(skippedRuleCategories.map(String));
     const skippedRuleInputsSet = new Set(
       rule.ruleInputs
         .filter((input) =>
-          skippedRuleCategoriesSet.has(String(input.ruleCategoryId))
+          skippedRuleCategoriesSet.has(String(input.ruleCategoryId)),
         )
-        .map((input) => String(input._id))
+        .map((input) => String(input._id)),
     );
 
     const indexWork = currentWork.map((work) =>
-      ruleInputsMap.get(String(work?._id))
+      ruleInputsMap.get(String(work?._id)),
     );
     if (isAdding) {
       noOfProblems = new Decimal(noOfProblems);
@@ -83,6 +83,7 @@ module.exports = function computeNextDayWork(
               else indexesChecked.add(i);
               break;
             }
+
             indexesChecked.add(i);
           }
           returnedArr = rule.ruleInputs.map((ruleInput, i) => ({
