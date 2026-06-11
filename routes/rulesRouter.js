@@ -3,7 +3,6 @@ const router = express.Router();
 
 const rulesController = require("../controllers/rulesController");
 const authController = require("../controllers/authController");
-
 router
   .route("/create-new-rule")
   .post(authController.restrictTo("admin"), rulesController.createNewRule);
@@ -24,7 +23,7 @@ router
   .route("/:ruleId/update-rule-category/:ruleCategoryId")
   .patch(
     authController.restrictTo("admin"),
-    rulesController.updateRuleCategory
+    rulesController.updateRuleCategory,
   );
 
 router
@@ -43,7 +42,7 @@ router
   .route("/:ruleId/change-rule-input-order")
   .patch(
     authController.restrictTo("admin"),
-    rulesController.changeRuleInputOrder
+    rulesController.changeRuleInputOrder,
   );
 
 router
@@ -54,7 +53,7 @@ router
   .route("/:ruleId/update-standard-points/:ruleCategoryId")
   .patch(
     authController.restrictTo("admin"),
-    rulesController.updateStandardPoints
+    rulesController.updateStandardPoints,
   );
 
 router
@@ -67,7 +66,7 @@ router
   .route("/get-existing-rule-categories/:taskId")
   .get(
     authController.restrictTo("admin"),
-    rulesController.getExistingRuleCategories
+    rulesController.getExistingRuleCategories,
   );
 
 module.exports = router;
