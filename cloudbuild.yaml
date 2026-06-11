@@ -11,6 +11,7 @@ steps:
           --runtime="nodejs22" \
           --source="." \
           --trigger-http \
+          --memory="512MiB" \
           --entry-point="${_ENTRY_POINT}" \
           --allow-unauthenticated \
           --set-env-vars="DEFAULT_TIMEZONE=America/Denver,SALT_COST_FACTOR=10,JWT_EXPIRES_IN=1d,ORIGIN_URL=https://day-forge.netlify.app,COOKIE_NAME=dayforge_jwt" \
