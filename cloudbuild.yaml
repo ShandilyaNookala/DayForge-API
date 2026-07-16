@@ -16,7 +16,7 @@ steps:
           --max-instances=3 \
           --entry-point="${_ENTRY_POINT}" \
           --allow-unauthenticated \
-          --set-env-vars="DEFAULT_TIMEZONE=America/Denver,SALT_COST_FACTOR=10,JWT_EXPIRES_IN=1d,ORIGIN_URL=https://day-forge.netlify.app,COOKIE_NAME=dayforge_jwt" \
+          --set-env-vars="DEFAULT_TIMEZONE=America/Denver,SALT_COST_FACTOR=10,JWT_EXPIRES_IN=1d,ORIGIN_URL=https://day-forge.netlify.app,COOKIE_NAME=dayforge_jwt,MAX_REQUESTS=100,MAX_REQUEST_TIME=600,LOGIN_ATTEMPTS_PER_LOCK=3,LOCKOUT_BACKOFF_BASE=2" \
           --set-secrets="DB_USERNAME=projects/${_PROJECT_ID}/secrets/DB_USERNAME:latest,PASSWORD=projects/${_PROJECT_ID}/secrets/PASSWORD:latest,DATABASE_DAYFORGE=projects/${_PROJECT_ID}/secrets/DATABASE_DAYFORGE:latest,JWT_SECRET_FOR_DAYFORGE=projects/${_PROJECT_ID}/secrets/JWT_SECRET_FOR_DAYFORGE:latest" \
           --quiet
 

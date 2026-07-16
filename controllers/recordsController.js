@@ -84,7 +84,7 @@ exports.updateOrCreateRecordInArray = catchAsync(async (req, res) => {
       .findByIdAndUpdate(
         req.params.taskId,
         { $push: { records: data } },
-        { new: true }
+        { new: true },
       )
       .populate("rule");
   }
@@ -104,7 +104,7 @@ exports.updateOrCreateRecordInArray = catchAsync(async (req, res) => {
   keysToConvertToObjectId.forEach((key) => {
     if (Array.isArray(req.body[key])) {
       req.body[key] = req.body[key].map(
-        (id) => new mongoose.Types.ObjectId(id)
+        (id) => new mongoose.Types.ObjectId(id),
       );
     }
   });
@@ -117,7 +117,7 @@ exports.updateOrCreateRecordInArray = catchAsync(async (req, res) => {
     Object.keys(req.body).forEach(
       (key) =>
         key !== "nextWork" &&
-        (valuesToSet[`records.$[elem].${key}`] = req.body[key])
+        (valuesToSet[`records.$[elem].${key}`] = req.body[key]),
     );
     newRecords = await recordsTableModel
       .findByIdAndUpdate(
@@ -126,7 +126,7 @@ exports.updateOrCreateRecordInArray = catchAsync(async (req, res) => {
         {
           new: true,
           arrayFilters: [{ "elem._id": recordId }],
-        }
+        },
       )
       .populate("rule");
     if (
@@ -152,7 +152,7 @@ exports.updateManageRules = catchAsync(async (req, res) => {
   const ruleId = req.body.ruleId;
   await recordsTableModel.updateMany(
     { _id: { $in: taskIds } },
-    { rule: ruleId }
+    { rule: ruleId },
   );
   const { managedRules, tasksWithNoRule } = await getManagedRules();
   res.status(200).json({
@@ -173,7 +173,7 @@ exports.updateThresholdPoints = catchAsync(async (req, res) => {
         threshold: req.body.threshold,
         noOfProblems: req.body.noOfProblems,
       },
-      { new: true }
+      { new: true },
     )
     .populate("rule");
 
@@ -224,7 +224,7 @@ exports.getStudentTasks = catchAsync(async (req, res) => {
     });
   const dataGridData = returned.tasks.map((task, i) => {
     const currentRecord = task.records?.find((record) =>
-      compareDates(record.date, formattedDate, timezone)
+      compareDates(record.date, formattedDate, timezone),
     );
     return {
       ...currentRecord?.toObject(),
@@ -261,7 +261,7 @@ exports.getAutomaticDataWithMistakes = catchAsync(async (req, res) => {
     mistakes,
     record.noOfProblems,
     record.threshold,
-    record.skippedRuleCategories || []
+    record.skippedRuleCategories || [],
   );
 
   const arr = record.records[0].work;
@@ -275,7 +275,7 @@ exports.getAutomaticDataWithMistakes = catchAsync(async (req, res) => {
     data.grade = computeNextDayGrade(
       record.records[0].work,
       mistakes.map((el) => el.id),
-      weightedMistakes
+      weightedMistakes,
     );
   }
 
@@ -298,7 +298,7 @@ exports.addRecord = catchAsync(async (req, res) => {
       position: "currentTasks",
     },
     { $push: { tasks: newRecord._id } },
-    { new: true }
+    { new: true },
   );
   const allPositions = await aggregatePositions();
   res.status(200).json({
@@ -383,7 +383,7 @@ exports.getAutomaticData = catchAsync(async (req, res) => {
     mistakes,
     noOfProblems,
     threshold,
-    skippedRuleCategories || []
+    skippedRuleCategories || [],
   );
 
   res.status(200).json({ status: "success", data });
@@ -434,9 +434,9 @@ exports.markObsolete = catchAsync(async (req, res) => {
         await recordsTableModel.findByIdAndUpdate(
           task._id,
           { records: newRecords },
-          { new: true }
+          { new: true },
         );
-    })
+    }),
   );
   res.status(200).json({
     status: "success",

@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const xss = require("xss-clean");
 const mongoSanitize = require("express-mongo-sanitize");
 const cookieParser = require("cookie-parser");
+const { rateLimit } = require("express-rate-limit");
 
 dotenv.config({ path: "./config.env" });
 
@@ -18,19 +19,28 @@ const integrationRouter = require("./routes/integrationRouter");
 const { nonProtectedRoutes } = require("./config");
 const { protect } = require("./controllers/authController");
 
+const limiter = rateLimit({
+  windowMs: +process.env.MAX_REQUEST_TIME * 1000,
+  max: +process.env.MAX_REQUESTS,
+  message: "Too many requests, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const app = express();
 
 app.use(
   cors({
     origin: process.env.ORIGIN_URL,
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
 app.use(cookieParser());
+app.use(limiter);
 app.use((req, res, next) => {
   if (req.method === "POST" && nonProtectedRoutes.includes(req.path)) {
     next();
@@ -41,7 +51,7 @@ app.use((req, res, next) => {
 
 const DB = process.env.DATABASE_DAYFORGE.replace(
   "<USERNAME>",
-  process.env.DB_USERNAME
+  process.env.DB_USERNAME,
 ).replace("<PASSWORD>", process.env.PASSWORD);
 
 mongoose
