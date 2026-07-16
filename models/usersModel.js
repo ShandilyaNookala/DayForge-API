@@ -18,20 +18,29 @@ const usersSchema = new mongoose.Schema({
     enum: ["student", "admin", "semi-admin"],
     default: "student",
   },
+  lockUntil: {
+    type: Date,
+    default: null,
+  },
+  loginAttempts: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 });
 
 usersSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(
     this.password,
-    +process.env.SALT_COST_FACTOR
+    +process.env.SALT_COST_FACTOR,
   );
   next();
 });
 
 usersSchema.methods.correctPassword = async function (
   candidatePassword,
-  userPassword
+  userPassword,
 ) {
   return bcrypt.compare(candidatePassword, userPassword);
 };
