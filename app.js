@@ -49,10 +49,10 @@ app.use((req, res, next) => {
   }
 });
 
-const DB = process.env.DATABASE_DAYFORGE.replace(
-  "<USERNAME>",
-  process.env.DB_USERNAME,
-).replace("<PASSWORD>", process.env.PASSWORD);
+const DB = `${process.env.Application__MongoDb__ConnectionString.replace(
+  "<PASSWORD>",
+  process.env.Application__MongoDb__Password,
+)}/${process.env.Application__MongoDb__DatabaseDayForge}`;
 
 mongoose
   .connect(DB, {
